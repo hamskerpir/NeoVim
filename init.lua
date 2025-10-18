@@ -14,6 +14,9 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+local settings = require("settings")
+settings.setup()
+
 -- Make sure to setup `mapleader` and `maplocalleader` before
 -- loading lazy.nvim so that mappings are correct.
 -- This is also a good place to setup other settings (vim.opt)
@@ -39,3 +42,6 @@ end
 require("vim-options")
 -- Setup lazy.nvim
 require("lazy").setup("plugins")
+
+local custom_highlights = require("highlights")
+custom_highlights.setup()

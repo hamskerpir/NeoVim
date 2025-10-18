@@ -5,6 +5,9 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-telescope/telescope-ui-select.nvim",
+      "smartpde/telescope-recent-files",
+      "nvim-telescope/telescope-project.nvim",
+      "nvim-telescope/telescope-file-browser.nvim",
     },
     opts = function()
       local themes = require("telescope.themes")
@@ -18,6 +21,8 @@ return {
       local telescope = require("telescope")
       telescope.setup(opts)
       telescope.load_extension("ui-select")
+      telescope.load_extension("recent_files")
+      telescope.load_extension('project')
 
       local builtin = require("telescope.builtin")
       vim.keymap.set("n", "<leader>sf", builtin.find_files, { desc = "Search: Files" })

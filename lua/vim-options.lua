@@ -40,16 +40,3 @@ for type, icon in pairs(diagnostic_signs) do
   vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 end
 
-vim.api.nvim_create_autocmd("BufWritePost", {
-  pattern = { "*.c", "*.cpp", "*.h" },
-  callback = function(event)
-    local bufnr = event.buf
-    local clients = vim.lsp.get_active_clients({ bufnr = bufnr })
-    for _, client in ipairs(clients) do
-      if client.supports_method("textDocument/formatting") then
-        vim.lsp.buf.format({ async = true, bufnr = bufnr })
-        break
-      end
-    end
-  end,
-})
