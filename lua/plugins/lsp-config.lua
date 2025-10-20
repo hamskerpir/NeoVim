@@ -16,11 +16,14 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        terraformls = {},
+        hcl = {},
+        tflint = {},
+      },
+    },
     config = function()
-      -- NOTE: nvim-lspconfig is now used primarily for its server configuration definitions.
-      -- The core setup logic now uses the native vim.lsp.config() and LspAttach.
-
-      -- General LSP configuration settings
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       local ok_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
       if ok_cmp then
@@ -43,17 +46,6 @@ return {
 
       -- 2. Define or extend server configurations using vim.lsp.config()
       -- This replaces the loop and lspconfig[server].setup(config) calls.
-
-      -- Helper to create a custom root_dir function that uses vim.fs.find
-      -- and mimics lspconfig.util.root_pattern
-      local function create_root_dir_finder(patterns)
-        return function(fname)
-          -- vim.fs.find returns a list of paths, or nil if none found.
-          local root_path = vim.fs.find(patterns, { upward = true, stop = vim.env.HOME })[1]
-          return root_path and vim.fs.dirname(root_path) or nil
-        end
-      end
-
       -- a. lua_ls
       vim.lsp.config("lua_ls", {
         capabilities = capabilities,
@@ -65,16 +57,33 @@ return {
             },
           },
         },
-        -- Note: The root_dir is not explicitly set here, relying on lua_ls defaults
-        -- or what nvim-lspconfig provides for lua_ls.
       })
 
-      vim.lsp.config("ty", {})
+      vim.lsp.config("pyright", {
+        on_attach = on_attach,
+        root_dir = vim.fs.root(
+            vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p'),
+            { 'pyproject.toml' }
+        ),
+      })
 
-      -- 3. Enable the configurations
-      -- This tells Neovim to start these LSPs for their configured filetypes.
-      -- (The filetypes are usually defined by nvim-lspconfig defaults and merged in).
-      vim.lsp.enable({ "lua_ls", "ty" })
+      vim.lsp.config('hcl', {
+        on_attach = on_attach,
+        root_dir = vim.fs.root(
+           vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p'),
+           { '.terraform', '.git' }
+        ),
+      })
+      vim.lsp.config('terraformls', {
+        on_attach = on_attach,
+        filetypes = { "terraform", "terraform-vars" },
+        root_dir = vim.fs.root(
+           vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':p'),
+           { '.terraform', '.git' }
+        ),
+      })
+
+      vim.lsp.enable({ "lua_ls", "ty", "terraformls", "hcl" })
     end,
   },
 }

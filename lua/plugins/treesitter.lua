@@ -1,12 +1,20 @@
 return {
-  "nvim-treesitter/nvim-treesitter",
-  build = ":TSUpdate",
-  opts = {
-    ensure_installed = { "lua", "javascript", "python", "cpp" },
-    highlight = { enable = true },
-    indent = { enable = true },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    opts = {
+      ensure_installed = { "lua", "javascript", "python", "cpp", "terraform", "hcl" },
+      highlight = { enable = true },
+      indent = { enable = true },
+    },
+    config = function(_, opts)
+      require("nvim-treesitter.configs").setup(opts)
+
+      local parser_configs = require("nvim-treesitter.parsers").get_parser_configs()
+
+      parser_configs.hcl = {
+        filetype = {"hcl", "terraform"}
+      }
+    end,
   },
-  config = function(_, opts)
-    require("nvim-treesitter.configs").setup(opts)
-  end,
 }
