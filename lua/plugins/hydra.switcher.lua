@@ -5,13 +5,6 @@ return { "nvimtools/hydra.nvim", config = function()
 
   local gitHydra = Hydra({
      name = 'Git',
-     hint = [[
- _J_: next hunk   _s_: stage hunk        _d_: show deleted   _b_: blame line
- _K_: prev hunk   _u_: undo last stage   _p_: preview hunk   _B_: blame show full 
- ^ ^              _S_: stage buffer      ^ ^                 _/_: show base file
- ^
- ^ ^              _<Enter>_: Neogit              _q_: exit
-]],
      config = {
         color = 'pink',
         invoke_on_body = true,
@@ -33,6 +26,14 @@ return { "nvimtools/hydra.nvim", config = function()
         end,
      },
      mode = {'n','x'},
+    hint = [[
+ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
+ _J_ : next hunk   _K_ : prev hunk     _s_ : stage hunk
+ _S_ : stage buffer  _u_ : undo last stage
+ _B_ : blame full    
+ <Enter> : Neogit    _q_ : exit
+ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
+  ]],
      heads = {
         { 'J',
            function()
@@ -51,11 +52,7 @@ return { "nvimtools/hydra.nvim", config = function()
         { 's', ':Gitsigns stage_hunk<CR>', { silent = true, desc = 'stage hunk' } },
         { 'u', gitsigns.undo_stage_hunk, { desc = 'undo last stage' } },
         { 'S', gitsigns.stage_buffer, { desc = 'stage buffer' } },
-        { 'p', gitsigns.preview_hunk, { desc = 'preview hunk' } },
-        { 'd', gitsigns.toggle_deleted, { nowait = true, desc = 'toggle deleted' } },
-        { 'b', gitsigns.blame_line, { desc = 'blame' } },
         { 'B', function() gitsigns.blame_line{ full = true } end, { desc = 'blame show full' } },
-        { '/', gitsigns.show, { exit = true, desc = 'show base file' } }, -- show the base of the file
         { '<Enter>', '<Cmd>Neogit<CR>', { exit = true, desc = 'Neogit' } },
         { 'q', nil, { exit = true, nowait = true, desc = 'exit' } },
      }
@@ -161,6 +158,15 @@ return { "nvimtools/hydra.nvim", config = function()
         { '1', '<Cmd>Neotree<Cr>', { desc = 'File manager (Neotree)', nowait = true } },
         { '2', '<Cmd>BookmarkShowAll<Cr>', { desc = 'Bookmarks', nowait = true } },
 
+        { '8', cmd 'DiffviewFileHistory', { desc = 'Show commit history', nowait = true } },
+        {
+          '9',
+          function()
+            local filename = vim.fn.expand('%')
+            vim.api.nvim_command('DiffviewFileHistory ' .. filename)
+          end,
+          { desc = 'Show commit history for file' }
+        },
         { '0', cmd 'LazyGit', { desc = 'LazyGit', nowait = true } },
         --
         { 'b', '<Cmd>BookmarkAnnotate<Cr>', { desc = 'Annotate new Bookmark', nowait = true } },
@@ -186,9 +192,9 @@ return { "nvimtools/hydra.nvim", config = function()
      _1_ File Manager               _e_ Recent Files (Telescope)    
      _2_ Bookmarks Show All         _b_ Annotate New Bookmark
                                   _o_ Search files
-     _0_ Git                        _f_ Find in Files 
-                                  _p_ Open project 
-                                  _g_ Git menu 
+     _8_ Commit history             _f_ Find in Files 
+     _9_ Commits for file           _p_ Open project 
+     _0_ LazyGit                    _g_ Git menu 
                                   _n_ New scratch 
                                   _N_ Search scratch 
     _,_ Editor Options
