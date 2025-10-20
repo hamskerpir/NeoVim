@@ -169,6 +169,8 @@ return { "nvimtools/hydra.nvim", config = function()
         { 'o', cmd 'Telescope find_files', { desc = 'Find files', nowait = true } },
         { 'p', cmd 'Telescope project', { desc = 'Open projects', nowait = true } },
         { 'g', function() gitHydra:activate() end, { desc = 'Open projects', nowait = true } },
+        { 'n', cmd 'tabnew | ScratchWithName', { desc = 'New scratch file', nowait = true } },
+        { 'N', cmd 'ScratchOpenFzf', { desc = 'Search scratch', nowait = true } },
         --
         { ',', function() optionsHydra:activate() end, { desc = 'Open projects', nowait = true } },
       },
@@ -187,6 +189,8 @@ return { "nvimtools/hydra.nvim", config = function()
      _0_ Git                        _f_ Find in Files 
                                   _p_ Open project 
                                   _g_ Git menu 
+                                  _n_ New scratch 
+                                  _N_ Search scratch 
     _,_ Editor Options
 
     ]],
