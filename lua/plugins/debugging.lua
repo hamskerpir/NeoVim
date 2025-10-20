@@ -11,55 +11,25 @@ return {
         return
       end
 
-      local ok_dapui, dapui = pcall(require, "dapui")
-      local ok_dap_python, dap_python = pcall(require, "dap-python")
+      local dapui = require("dapui")
+      local dap_python = require("dap-python")
 
-      dap.set_log_level("WARN")
+      dap_python.setup("debugpy-adapter")
 
-      if ok_dapui then
-        dapui.setup()
-        dap.listeners.before.attach.dapui_config = function()
-          dapui.open()
-        end
-        dap.listeners.before.launch.dapui_config = function()
-          dapui.open()
-        end
-        dap.listeners.before.event_terminated.dapui_config = function()
-          dapui.close()
-        end
-        dap.listeners.before.event_exited.dapui_config = function()
-          dapui.close()
-        end
+      dap.set_log_level("INFO")
+
+      dapui.setup()
+      dap.listeners.before.attach.dapui_config = function()
+        dapui.open()
       end
-
-      if ok_dap_python then
-        dap_python.setup("uv", {
-          console = "integratedTerminal",
-        })
-
-        local orig_python_adapter = dap.adapters.python
-
-        local function is_uv_command(cmd)
-          if not cmd then
-            return false
-          end
-          if cmd == "uv" then
-            return true
-          end
-          local tail = cmd:match("([^/\\]+)$")
-          return tail == "uv"
-        end
-
-        dap.adapters.python = function(callback, config)
-          orig_python_adapter(function(adapter)
-            if adapter.type == "executable" and is_uv_command(adapter.command) then
-              adapter.args = { "run", "--module", "debugpy.adapter" }
-            end
-            callback(adapter)
-          end, config)
-        end
-
-        dap.adapters.debugpy = dap.adapters.python
+      dap.listeners.before.launch.dapui_config = function()
+        dapui.open()
+      end
+      dap.listeners.before.event_terminated.dapui_config = function()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited.dapui_config = function()
+        dapui.close()
       end
 
       vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "Debug: Toggle breakpoint" })

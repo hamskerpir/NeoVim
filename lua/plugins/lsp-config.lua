@@ -83,7 +83,7 @@ return {
         ),
       })
 
-      vim.lsp.enable({ "lua_ls", "ty", "terraformls", "hcl" })
+      vim.lsp.enable({ "lua_ls", "pyright", "terraformls", "hcl" })
     end,
   },
 }

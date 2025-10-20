@@ -37,6 +37,7 @@ return {
               ".venv",
             },
             hide_by_pattern = {
+              "__pycache__",
               "*.pyc",
             },
             never_show = {
