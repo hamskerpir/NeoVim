@@ -177,6 +177,7 @@ return { "nvimtools/hydra.nvim", config = function()
         { 'g', function() gitHydra:activate() end, { desc = 'Open projects', nowait = true } },
         { 'n', cmd 'tabnew | ScratchWithName', { desc = 'New scratch file', nowait = true } },
         { 'N', cmd 'ScratchOpenFzf', { desc = 'Search scratch', nowait = true } },
+        { 'E', vim.diagnostic.setqflist, { desc = 'Issues', nowait = true } },
         --
         { ',', function() optionsHydra:activate() end, { desc = 'Open projects', nowait = true } },
       },
@@ -197,6 +198,7 @@ return { "nvimtools/hydra.nvim", config = function()
      _0_ LazyGit                    _g_ Git menu 
                                   _n_ New scratch 
                                   _N_ Search scratch 
+                                  _E_ Issues 
     _,_ Editor Options
 
     ]],
