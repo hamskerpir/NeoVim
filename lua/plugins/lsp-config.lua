@@ -67,6 +67,17 @@ return {
         ),
       })
 
+      vim.lsp.config("helm_ls", {
+        on_attach = on_attach,
+        settings = {
+          ['helm-ls'] = {
+            yamlls = {
+              path = "yaml-language-server",
+            }
+          }
+        }
+      })
+
       vim.lsp.config('hcl', {
         on_attach = on_attach,
         root_dir = vim.fs.root(
@@ -83,7 +94,7 @@ return {
         ),
       })
 
-      vim.lsp.enable({ "lua_ls", "pyright", "terraformls", "hcl" })
+      vim.lsp.enable({ "lua_ls", "pyright", "terraformls", "hcl", "helm_ls" })
     end,
   },
 }
