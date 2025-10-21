@@ -8,7 +8,12 @@ opt.clipboard = "unnamedplus"
 opt.signcolumn = "yes"
 
 vim.keymap.set({ "i", "n", "v" }, "<C-c>", "<Esc>", { desc = "Make Ctrl+C behave like Escape" })
-
+vim.keymap.set(
+  "v",
+  "<C-r>",
+  '\"hy:%s/<C-r>h//gc<left><left><left>',
+  { desc = "Search and replace selected text" }
+)
 
 vim.diagnostic.config({
   virtual_lines = true,
