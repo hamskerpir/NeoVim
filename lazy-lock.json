@@ -11,6 +11,7 @@
   "helm-ls.nvim": { "branch": "main", "commit": "f36ecbd3e7b0b2ac8358a9d6a3213888e29943db" },
   "hurl.nvim": { "branch": "main", "commit": "0e5430d5130fe95fc1b8b015491b50274aa2e796" },
   "hydra.nvim": { "branch": "main", "commit": "8c4a9f621ec7cdc30411a1f3b6d5eebb12b469dc" },
+  "kubernetes.nvim": { "branch": "main", "commit": "44daf998345628a1a7034e3aaa31f4e05e4dde7c" },
   "lazy.nvim": { "branch": "main", "commit": "1ea3c4085785f460fb0e46d2fe1ee895f5f9e7c1" },
   "lazygit.nvim": { "branch": "main", "commit": "2305deed25bc61b866d5d39189e9105a45cf1cfb" },
   "lspkind-nvim": { "branch": "master", "commit": "3ddd1b4edefa425fda5a9f95a4f25578727c0bb3" },
@@ -36,6 +37,7 @@
   "telescope-recent-files": { "branch": "main", "commit": "eb190c0baded1cbfa9d8767c817b054377683163" },
   "telescope-ui-select.nvim": { "branch": "master", "commit": "6e51d7da30bd139a6950adf2a47fda6df9fa06d2" },
   "telescope.nvim": { "branch": "master", "commit": "a0bbec21143c7bc5f8bb02e0005fa0b982edc026" },
+  "vim-better-whitespace": { "branch": "master", "commit": "de99b55a6fe8c96a69f9376f16b1d5d627a56e81" },
   "vim-bookmarks": { "branch": "master", "commit": "9cc5fa7ecc23b052bd524d07c85356c64b92aeef" },
   "vim-cutlass": { "branch": "master", "commit": "7afd649415541634c8ce317fafbc31cd19d57589" },
   "vim-helm": { "branch": "master", "commit": "2c8525fd98e57472769d137317bca83e477858ce" }

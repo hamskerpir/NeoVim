@@ -45,3 +45,6 @@ require("lazy").setup("plugins")
 
 local custom_highlights = require("highlights")
 custom_highlights.setup()
+local autocmd = require("autocmd")
+autocmd.setup()
+

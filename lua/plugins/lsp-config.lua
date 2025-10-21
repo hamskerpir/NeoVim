@@ -24,6 +24,7 @@ return {
       },
     },
     config = function()
+      local telescope = require('telescope.builtin')
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       local ok_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
       if ok_cmp then
@@ -40,7 +41,7 @@ return {
         map("n", "K", vim.lsp.buf.hover, "Hover documentation")
         map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
         map("n", "gd", vim.lsp.buf.definition, "Go to definition")
-        map("n", "gr", vim.lsp.buf.references, "Find references")
+        map("n", "gr", telescope.lsp_references, "Find references")
         map("n", "<leader>ca", vim.lsp.buf.code_action, "Code action")
       end
 
@@ -73,6 +74,11 @@ return {
           ['helm-ls'] = {
             yamlls = {
               path = "yaml-language-server",
+              yaml = {
+                schemas = {
+                  [require('kubernetes').yamlls_schema()] = "*.yaml",
+                }
+              }
             }
           }
         }
