@@ -2,7 +2,7 @@ local deps = {
   "plugins.lsp.lua",
   "plugins.lsp.python",
   "plugins.lsp.kubernetes.helm",
-  "plugins.lsp.terraform.hcl",
+  -- "plugins.lsp.terraform.hcl",
   "plugins.lsp.terraform.terraform",
 }
 
@@ -12,7 +12,6 @@ return {
     dependencies = {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
-      "stevearc/conform.nvim",
     },
     event = "VeryLazy",
     opts = {

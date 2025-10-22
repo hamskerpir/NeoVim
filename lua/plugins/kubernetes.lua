@@ -1,4 +1,3 @@
 return {
-  "diogo464/kubernetes.nvim"
+	"diogo464/kubernetes.nvim",
 }
-
