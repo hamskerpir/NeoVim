@@ -14,12 +14,13 @@ vim.keymap.set("n", "r", "<C-r>", {
 	silent = true,
 	desc = "Redo (was <C-r>)",
 })
--- Remap '>' to indent and reselect the visual block
+--- VISUAL ---
 vim.keymap.set("x", ">", ">gv", { noremap = true, silent = true, desc = "Indent and Reselect" })
--- Remap '<' to dedent and reselect the visual block
 vim.keymap.set("x", "<", "<gv", { noremap = true, silent = true, desc = "Dedent and Reselect" })
+vim.keymap.set("x", "<leader>rf", ":Refactor extract ")
+vim.keymap.set("x", "<leader>rv", ":Refactor extract_var ")
 
--- deletions
+--- NORMAL ---
 vim.keymap.set("n", "<S-Up>", "<Up>", { desc = "remove unsued" })
 vim.keymap.set("n", "<S-Down>", "<Down>", { desc = "remove unsued" })
 
