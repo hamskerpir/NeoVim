@@ -1,6 +1,7 @@
 local deps = {
 	"plugins.lsp.lua",
 	"plugins.lsp.python",
+	"plugins.lsp.javascript",
 	"plugins.lsp.harper",
 	"plugins.lsp.kubernetes.helm",
 	-- "plugins.lsp.terraform.hcl",
