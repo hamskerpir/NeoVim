@@ -25,7 +25,7 @@ vim.keymap.set("n", "<S-Up>", "<Up>", { desc = "remove unsued" })
 vim.keymap.set("n", "<S-Down>", "<Down>", { desc = "remove unsued" })
 
 vim.diagnostic.config({
-	virtual_lines = true,
+	-- virtual_lines = true,
 	virtual_text = {
 		prefix = " ",
 		spacing = 2,
