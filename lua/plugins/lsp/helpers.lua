@@ -11,7 +11,12 @@ function M.get_on_attach()
 		map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
 		map("n", "gd", vim.lsp.buf.definition, "Go to definition")
 		map("n", "gr", telescope.lsp_references, "Find references")
-		map("n", "<leader>ca", vim.lsp.buf.code_action, "Code action")
+		map({ "n", "v" }, "<M-CR>", function()
+			require("custom_actions").code_actions()
+		end, "Code actions & refactoring")
+		map("n", "<leader>i", function()
+			require("custom_actions").import_actions()
+		end, "Import missing")
 	end
 end
 

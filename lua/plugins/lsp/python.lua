@@ -1,6 +1,5 @@
-local lsp = "ty"
+local lsp = "basedpyright"
 -- local lsp = "pyright"
--- local lsp = "basedpyright"
 -- local lsp = "ruff"
 
 local linter = "ruff"
