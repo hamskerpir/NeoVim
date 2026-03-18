@@ -1,4 +1,4 @@
-local lsp = "basedpyright"
+local lsp = "ty"
 -- local lsp = "pyright"
 -- local lsp = "ruff"
 

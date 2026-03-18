@@ -82,6 +82,22 @@ local function get_refactor_actions()
   return actions_list
 end
 
+-- NEW: Helper to get DAP actions
+local function get_dap_actions()
+  local ok, dap = pcall(require, "dap")
+  if not ok then return {} end
+
+  return {
+    {
+      title = "[Debug] Set Conditional Breakpoint",
+      action = function()
+        dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
+      end,
+      type = "dap",
+    }
+  }
+end
+
 M.import_actions = function(opts)
   opts = opts or {}
   opts = require("telescope.themes").get_cursor(opts)
@@ -162,6 +178,7 @@ M.code_actions = function(opts)
 
   local lsp_actions = get_lsp_actions(bufnr, range)
   local refactor_actions = get_refactor_actions()
+  local dap_actions = get_dap_actions()
 
   local all_actions = {}
   for _, a in ipairs(lsp_actions) do
@@ -169,6 +186,7 @@ M.code_actions = function(opts)
     table.insert(all_actions, a)
   end
   for _, a in ipairs(refactor_actions) do table.insert(all_actions, a) end
+  for _, a in ipairs(dap_actions) do table.insert(all_actions, a) end
 
   if #all_actions == 0 then
     vim.notify("No code actions available", vim.log.levels.INFO)
@@ -199,6 +217,8 @@ M.code_actions = function(opts)
           execute_lsp_action(item.action, item.client_id)
         elseif item.type == "refactor" then
           require("refactoring").refactor(item.action)
+        elseif item.type == "dap" then
+          item.action()
         end
       end)
       return true
