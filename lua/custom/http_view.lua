@@ -2,6 +2,7 @@ local M = {}
 
 M.open_http_view = function()
 	local http_file = vim.fn.expand("~/.http/all.http")
+	vim.cmd("tabnew")
 	vim.cmd("edit " .. http_file)
 	vim.cmd("AerialOpen")
 	vim.schedule(function()
