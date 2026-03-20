@@ -8,6 +8,9 @@ opt.clipboard = "unnamedplus"
 opt.signcolumn = "yes"
 
 vim.keymap.set({ "i", "n", "v" }, "<C-c>", "<Esc>", { desc = "Make Ctrl+C behave like Escape" })
+vim.keymap.set({ "n", "v" }, "<M-CR>", function()
+	require("custom_actions").code_actions()
+end, { desc = "Code actions & refactoring" })
 vim.keymap.set("v", "<C-r>", '"hy:%s/<C-r>h//gc<left><left><left>', { desc = "Search and replace selected text" })
 vim.keymap.set("n", "r", "<C-r>", {
 	noremap = true,

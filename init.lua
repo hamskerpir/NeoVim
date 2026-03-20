@@ -47,3 +47,5 @@ local custom_highlights = require("highlights")
 custom_highlights.setup()
 local hooks = require("hooks")
 hooks.setup()
+
+require("custom")
