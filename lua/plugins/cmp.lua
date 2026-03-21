@@ -84,7 +84,7 @@ return {
         ghost_text = true,
       }
     })
-    
+
     -- ✨ NEW: Configuration to enable auto-source for filetypes (e.g., in commit messages)
     -- This makes buffer suggestions work in git commits and text files.
     cmp.setup.filetype({ 'gitcommit', 'markdown', 'text' }, {

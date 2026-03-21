@@ -6,6 +6,7 @@ return {
       "nvim-neotest/nvim-nio",
       "theHamsta/nvim-dap-virtual-text",
       "mfussenegger/nvim-dap-python",
+      "leoluz/nvim-dap-go",
       "jay-babu/mason-nvim-dap.nvim",
       "williamboman/mason.nvim",
     },
@@ -17,7 +18,7 @@ return {
       require("mason").setup()
       require("mason-nvim-dap").setup({
         automatic_installation = true,
-        ensure_installed = { "python", "codelldb" },
+        ensure_installed = { "python", "codelldb", "delve" },
       })
 
       require("nvim-dap-virtual-text").setup({ commented = true })
@@ -107,6 +108,25 @@ return {
       end
 
       -------------------------------------------------------------------------
+      -- Go Setup
+      -------------------------------------------------------------------------
+      local function setup_go_dap()
+        local ok_go, dap_go = pcall(require, "dap-go")
+        if not ok_go then return end
+        dap_go.setup()
+      end
+
+      if vim.bo.filetype == "go" then
+        setup_go_dap()
+      else
+        vim.api.nvim_create_autocmd("FileType", {
+          pattern = "go",
+          once = true,
+          callback = setup_go_dap,
+        })
+      end
+
+      -------------------------------------------------------------------------
       -- C/C++/Rust (codelldb)
       -------------------------------------------------------------------------
       local function setup_codelldb()
@@ -144,6 +164,7 @@ return {
       require("dap.ext.vscode").load_launchjs(nil, {
         python = { "python" },
         codelldb = { "c", "cpp", "rust" },
+        go = { "go" },
       })
 
       -- Keymaps

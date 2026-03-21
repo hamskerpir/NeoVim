@@ -218,7 +218,7 @@ return {
 					{ desc = "Show commit history for file" },
 				},
 				{ "0", cmd("LazyGit"), { desc = "LazyGit", nowait = true } },
-				{ "d", cmd("DBUIToggle"), { desc = "Database UI", nowait = true } },
+				{ "d", function() require("dbee").toggle() end, { desc = "Dbee (Database UI)", nowait = true } },
 				--
 				{ "b", "<Cmd>BookmarkAnnotate<Cr>", { desc = "Annotate new Bookmark", nowait = true } },
 				{ "f", cmd("Telescope live_grep") },
@@ -260,7 +260,7 @@ return {
      _8_ Commit history             _f_ Find in Files
      _9_ Commits for file           _p_ Open project
      _0_ LazyGit                    _g_ Git menu
-     _d_ Database UI                _n_ New scratch
+     _d_ Dbee (Database UI)         _n_ New scratch
      _h_ Http View                  _N_ Search scratch
                                   _E_ Issues
     _,_ Editor Options
