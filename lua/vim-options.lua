@@ -24,6 +24,9 @@ vim.keymap.set("x", "<leader>rf", ":Refactor extract ")
 vim.keymap.set("x", "<leader>rv", ":Refactor extract_var ")
 
 --- NORMAL ---
+vim.keymap.set("n", "q:", "<nop>", { desc = "Disable command-line window" })
+vim.keymap.set("n", "q/", "<nop>", { desc = "Disable search history window" })
+vim.keymap.set("n", "q?", "<nop>", { desc = "Disable search history window" })
 vim.keymap.set("n", "<S-Up>", "<Up>", { desc = "remove unsued" })
 vim.keymap.set("n", "<S-Down>", "<Down>", { desc = "remove unsued" })
 
