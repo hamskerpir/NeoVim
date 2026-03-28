@@ -225,6 +225,8 @@ return {
 				{ "e", cmd("Telescope oldfiles"), { desc = "Recent files", nowait = true } },
 				{ "o", cmd("Telescope find_files"), { desc = "Find files", nowait = true } },
 				{ "p", cmd("Telescope project"), { desc = "Open projects", nowait = true } },
+				{ "7", cmd("AerialToggle"), { desc = "Open file structure", nowait = true } },
+				{ "S", cmd("AerialNavToggle"), { desc = "Open file structure modal", nowait = true } },
 				{
 					"g",
 					function()
@@ -257,6 +259,7 @@ return {
      _1_ File Manager               _e_ Recent Files (Telescope)
      _2_ Bookmarks Show All         _b_ Annotate New Bookmark
                                   _o_ Search files
+     _7_ File structure             _S_ File Structure Modal
      _8_ Commit history             _f_ Find in Files
      _9_ Commits for file           _p_ Open project
      _0_ LazyGit                    _g_ Git menu
