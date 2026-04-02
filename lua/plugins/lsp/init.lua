@@ -4,6 +4,7 @@ local deps = {
 	"plugins.lsp.go",
 	"plugins.lsp.ruby",
 	"plugins.lsp.javascript",
+	"plugins.lsp.vue",
 	--	"plugins.lsp.harper",
 	"plugins.lsp.kubernetes.helm",
 	-- "plugins.lsp.terraform.hcl",
@@ -16,6 +17,7 @@ return {
 		dependencies = {
 			"williamboman/mason.nvim",
 			"williamboman/mason-lspconfig.nvim",
+			"WhoIsSethDaniel/mason-tool-installer.nvim",
 		},
 		event = "VeryLazy",
 		opts = {
@@ -28,6 +30,7 @@ return {
 		config = function()
 			require("mason").setup()
 			local mason_lspconfig = require("mason-lspconfig")
+			local mason_tool_installer = require("mason-tool-installer")
 
 			local mod_deps = {}
 			-- iterate over all submodules
@@ -43,6 +46,20 @@ return {
 			mason_lspconfig.setup({
 				automatic_installation = true,
 				ensure_installed = mod_deps,
+				handlers = {
+					function(server_name)
+						require("lspconfig")[server_name].setup({})
+					end,
+				},
+			})
+
+			mason_tool_installer.setup({
+				ensure_installed = {
+					"prettier",
+					"prettierd",
+					"xmlformatter",
+				},
+				run_on_start = true,
 			})
 		end,
 	},

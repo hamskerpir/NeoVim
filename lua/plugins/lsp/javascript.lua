@@ -18,17 +18,45 @@ local lsp_helpers = require("plugins.lsp.helpers")
 -- Define the root markers appropriate for Node/Frontend projects
 local root_files = { "package.json", "tsconfig.json", "jsconfig.json", ".git" }
 
--- Calculate the project root directory
-local root_dir = vim.fs.root(vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p"), root_files)
-
 -- Configure all LSPs using the custom 'vim.lsp.config' function
 -- NOTE: This assumes your custom 'vim.lsp.config' handles applying
 -- these shared settings correctly to each server based on filetype.
 for _, server in ipairs(lsps) do
-	vim.lsp.config(server, {
+	local config = {
 		on_attach = lsp_helpers.get_on_attach(),
-		root_dir = root_dir,
-	})
+		root_dir = function(fname)
+			return vim.fs.root(fname, root_files)
+		end,
+	}
+
+	-- Add specific settings for 'ts_ls' to support Vue files (Hybrid Mode)
+	if server == "ts_ls" then
+		local ok_reg, registry = pcall(require, "mason-registry")
+		if ok_reg then
+			local ok_pkg, vue_package = pcall(registry.get_package, "vue-language-server")
+			if ok_pkg and type(vue_package) == "table" and vue_package.is_installed and vue_package:is_installed() then
+				local ok_path, vue_plugin_path = pcall(function()
+					return vue_package:get_install_path()
+						.. "/node_modules/@vue/typescript-plugin"
+				end)
+
+				if ok_path then
+					config.init_options = {
+						plugins = {
+							{
+								name = "@vue/typescript-plugin",
+								location = vue_plugin_path,
+								languages = { "vue" },
+							},
+						},
+					}
+					config.filetypes = { "javascript", "typescript", "javascriptreact", "typescriptreact", "vue" }
+				end
+			end
+		end
+	end
+
+	vim.lsp.config(server, config)
 end
 
 return lsps

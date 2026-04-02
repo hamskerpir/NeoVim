@@ -7,7 +7,9 @@ M.setup = function()
 			python = { "isort", "ruff", "black" },
 			rust = { "rustfmt", lsp_format = "fallback" },
 			javascript = { "prettierd", "prettier", stop_after_first = true },
+			vue = { "prettierd", "prettier", stop_after_first = true },
 			yaml = { "prettierd" },
+			xml = { "xmlformatter" },
 		},
 	})
 	vim.api.nvim_create_autocmd("BufWritePre", {

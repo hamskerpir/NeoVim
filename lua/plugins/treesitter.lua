@@ -3,7 +3,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     opts = {
-      ensure_installed = { "lua", "javascript", "python", "cpp", "terraform", "hcl" },
+      ensure_installed = { "lua", "javascript", "python", "cpp", "terraform", "hcl", "vue" },
       highlight = { enable = true },
       indent = { enable = true },
     },
