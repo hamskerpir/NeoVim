@@ -105,6 +105,66 @@ local function get_dap_actions()
 	}
 end
 
+-- Custom actions
+M.fold_all_functions = function()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local params = { textDocument = vim.lsp.util.make_text_document_params() }
+
+	vim.lsp.buf_request(bufnr, "textDocument/documentSymbol", params, function(err, result, _, _)
+		if err or not result then
+			vim.notify("No symbols found to fold", vim.log.levels.INFO)
+			return
+		end
+
+		local function find_functions(symbols, found)
+			for _, symbol in ipairs(symbols) do
+				local range = symbol.range or (symbol.location and symbol.location.range)
+				if range and (symbol.kind == 6 or symbol.kind == 12) then
+					table.insert(found, range)
+				end
+				if symbol.children then
+					find_functions(symbol.children, found)
+				end
+			end
+		end
+
+		local function_ranges = {}
+		find_functions(result, function_ranges)
+
+		if #function_ranges == 0 then
+			vim.notify("No functions found to fold", vim.log.levels.INFO)
+			return
+		end
+
+		-- Set foldmethod to manual and clear existing folds
+		vim.opt_local.foldmethod = "manual"
+		vim.cmd("normal! zE")
+
+		for _, range in ipairs(function_ranges) do
+			local start_line = range.start.line + 1
+			local end_line = range["end"].line + 1
+			-- Only fold if it spans more than one line
+			if start_line < end_line then
+				local ok, fold_err = pcall(vim.cmd, string.format("%d,%dfold", start_line, end_line))
+				if not ok then
+					-- Ignore errors if fold already exists or range is invalid
+				end
+			end
+		end
+		vim.cmd("normal! zM") -- Close all folds
+	end)
+end
+
+local function get_custom_actions()
+	return {
+		{
+			title = "[Custom] Fold All Functions",
+			action = "fold_all_functions",
+			type = "custom",
+		},
+	}
+end
+
 M.code_actions = function(opts)
 	opts = opts or {}
 	opts = require("telescope.themes").get_cursor(opts)
@@ -115,6 +175,7 @@ M.code_actions = function(opts)
 
 	local refactor_actions = get_refactor_actions()
 	local dap_actions = get_dap_actions()
+	local custom_actions = get_custom_actions()
 	local range = nil
 
 	if is_visual then
@@ -139,6 +200,9 @@ M.code_actions = function(opts)
 		table.insert(all_actions, a)
 	end
 	for _, a in ipairs(dap_actions) do
+		table.insert(all_actions, a)
+	end
+	for _, a in ipairs(custom_actions) do
 		table.insert(all_actions, a)
 	end
 
@@ -189,6 +253,10 @@ M.code_actions = function(opts)
 						elseif item.type == "dap" then
 							if item.action == "conditional_breakpoint" then
 								require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
+							end
+						elseif item.type == "custom" then
+							if item.action == "fold_all_functions" then
+								M.fold_all_functions()
 							end
 						end
 					end)
