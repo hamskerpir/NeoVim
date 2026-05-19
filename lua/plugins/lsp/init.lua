@@ -2,7 +2,7 @@ local deps = {
 	"plugins.lsp.lua",
 	"plugins.lsp.python",
 	"plugins.lsp.go",
-	"plugins.lsp.ruby",
+	--"plugins.lsp.ruby",
 	"plugins.lsp.javascript",
 	"plugins.lsp.vue",
 	--	"plugins.lsp.harper",
