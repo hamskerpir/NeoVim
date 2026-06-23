@@ -12,6 +12,11 @@ return {
     opts = function()
       local themes = require("telescope.themes")
       return {
+        defaults = {
+          preview = {
+            treesitter = false,
+          },
+        },
         extensions = {
           ["ui-select"] = themes.get_dropdown(),
         },

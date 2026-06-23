@@ -160,13 +160,6 @@ return {
       end
       setup_codelldb()
 
-      -- Load launch.json
-      require("dap.ext.vscode").load_launchjs(nil, {
-        python = { "python" },
-        codelldb = { "c", "cpp", "rust" },
-        go = { "go" },
-      })
-
       -- Keymaps
       local opts = { noremap = true, silent = true }
       vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, vim.tbl_extend("force", opts, { desc = "Debug: Toggle Breakpoint" }))
