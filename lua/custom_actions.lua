@@ -72,17 +72,24 @@ end
 
 -- Helper to get Refactoring plugin actions
 local function get_refactor_actions()
-	local has_refactoring, refactoring = pcall(require, "refactoring")
+	local has_refactoring = pcall(require, "refactoring")
 	if not has_refactoring then
 		return {}
 	end
 
-	local refactors = refactoring.get_refactors()
+	local refactors = {
+		{ title = "Extract Function", action = "extract_func" },
+		{ title = "Extract Function To File", action = "extract_func_to_file" },
+		{ title = "Extract Variable", action = "extract_var" },
+		{ title = "Inline Function", action = "inline_func" },
+		{ title = "Inline Variable", action = "inline_var" },
+	}
+
 	local actions_list = {}
-	for _, refactor_name in ipairs(refactors) do
+	for _, ref in ipairs(refactors) do
 		table.insert(actions_list, {
-			title = "[Refactor] " .. refactor_name,
-			action = refactor_name,
+			title = "[Refactor] " .. ref.title,
+			action = ref.action,
 			type = "refactor",
 		})
 	end
@@ -241,14 +248,13 @@ M.code_actions = function(opts)
 						elseif item.type == "refactor" then
 							if is_visual then
 								-- Reliable visual re-selection + command simulation
-								local cmd_name =
-									item.action:lower():gsub(" ", "_"):gsub("variable", "var"):gsub("function", "func")
-								-- if cmd_name == "extract_variable" then cmd_name = "extract_var" end
-
-								local cmd = string.format("gv:Refactor %s<cr>", cmd_name)
+								local cmd = string.format("gv:Refactor %s<cr>", item.action)
 								vim.api.nvim_input(cmd)
 							else
-								require("refactoring").refactor(item.action)
+								local keys = require("refactoring")[item.action]()
+								if keys then
+									vim.api.nvim_input(keys)
+								end
 							end
 						elseif item.type == "dap" then
 							if item.action == "conditional_breakpoint" then
