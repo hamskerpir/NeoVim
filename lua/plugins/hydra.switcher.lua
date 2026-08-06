@@ -3,80 +3,6 @@ return {
 	config = function()
 		local Hydra = require("hydra")
 		local cmd = require("hydra.keymap-util").cmd
-		local gitsigns = require("gitsigns")
-
-		local gitHydra = Hydra({
-			name = "Git",
-			config = {
-				color = "pink",
-				invoke_on_body = true,
-				on_enter = function()
-					vim.cmd("mkview")
-					vim.cmd("silent! %foldopen!")
-					vim.bo.modifiable = false
-					gitsigns.toggle_signs(true)
-					gitsigns.toggle_linehl(true)
-				end,
-				on_exit = function()
-					local cursor_pos = vim.api.nvim_win_get_cursor(0)
-					vim.cmd("loadview")
-					vim.api.nvim_win_set_cursor(0, cursor_pos)
-					vim.cmd("normal zv")
-					gitsigns.toggle_signs(false)
-					gitsigns.toggle_linehl(false)
-					gitsigns.toggle_deleted(false)
-				end,
-			},
-			mode = { "n", "x" },
-			hint = [[
- ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
- _J_ : next hunk   _K_ : prev hunk     _s_ : stage hunk
- _S_ : stage buffer  _u_ : undo last stage
- _B_ : blame full
- <Enter> : Neogit    _q_ : exit
- ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
-  ]],
-			heads = {
-				{
-					"J",
-					function()
-						if vim.wo.diff then
-							return "]c"
-						end
-						vim.schedule(function()
-							gitsigns.next_hunk()
-						end)
-						return "<Ignore>"
-					end,
-					{ expr = true, desc = "next hunk" },
-				},
-				{
-					"K",
-					function()
-						if vim.wo.diff then
-							return "[c"
-						end
-						vim.schedule(function()
-							gitsigns.prev_hunk()
-						end)
-						return "<Ignore>"
-					end,
-					{ expr = true, desc = "prev hunk" },
-				},
-				{ "s", ":Gitsigns stage_hunk<CR>", { silent = true, desc = "stage hunk" } },
-				{ "u", gitsigns.undo_stage_hunk, { desc = "undo last stage" } },
-				{ "S", gitsigns.stage_buffer, { desc = "stage buffer" } },
-				{
-					"B",
-					function()
-						gitsigns.blame_line({ full = true })
-					end,
-					{ desc = "blame show full" },
-				},
-				{ "<Enter>", "<Cmd>Neogit<CR>", { exit = true, desc = "Neogit" } },
-				{ "q", nil, { exit = true, nowait = true, desc = "exit" } },
-			},
-		})
 
 		local optionsHydra = Hydra({
 			name = "Options",
@@ -227,13 +153,6 @@ return {
 				{ "p", cmd("Telescope project"), { desc = "Open projects", nowait = true } },
 				{ "7", cmd("AerialToggle"), { desc = "Open file structure", nowait = true } },
 				{ "S", cmd("AerialNavToggle"), { desc = "Open file structure modal", nowait = true } },
-				{
-					"g",
-					function()
-						gitHydra:activate()
-					end,
-					{ desc = "Open projects", nowait = true },
-				},
 				{ "n", cmd("tabnew | ScratchWithName"), { desc = "New scratch file", nowait = true } },
 				{ "h", cmd("HttpView"), { desc = "HTTP View window", nowait = true } },
 				{ "N", cmd("ScratchOpenFzf"), { desc = "Search scratch", nowait = true } },
@@ -262,7 +181,7 @@ return {
      _7_ File structure             _S_ File Structure Modal
      _8_ Commit history             _f_ Find in Files
      _9_ Commits for file           _p_ Open project
-     _0_ LazyGit                    _g_ Git menu
+     _0_ LazyGit
      _d_ Dbee (Database UI)         _n_ New scratch
      _h_ Http View                  _N_ Search scratch
                                   _E_ Issues
