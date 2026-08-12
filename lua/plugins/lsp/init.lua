@@ -20,25 +20,14 @@ return {
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
 		},
 		event = "VeryLazy",
-		opts = {
-			servers = {
-				terraformls = {},
-				hcl = {},
-				tflint = {},
-			},
-		},
 		config = function()
 			require("mason").setup()
 			local mason_lspconfig = require("mason-lspconfig")
 			local mason_tool_installer = require("mason-tool-installer")
 
 			local mod_deps = {}
-			-- iterate over all submodules
 			for _, mod in ipairs(deps) do
-				-- get their dependencies
-				local mod_d = require(mod)
-				-- iterate over each dependency to insert it in pool
-				for _, d in ipairs(mod_d) do
+				for _, d in ipairs(require(mod)) do
 					table.insert(mod_deps, d)
 				end
 			end
@@ -50,7 +39,22 @@ return {
 					function(server_name)
 						require("lspconfig")[server_name].setup({})
 					end,
+					-- managed directly via vim.lsp.config + vim.lsp.enable in javascript.lua
+					ts_ls = function() end,
+					vtsls = function() end,
 				},
+			})
+
+			-- lspconfig v5 auto-enables ts_ls even with a no-op handler;
+			-- disable it now and kill any client that still sneaks through.
+			vim.lsp.enable("ts_ls", false)
+			vim.api.nvim_create_autocmd("LspAttach", {
+				callback = function(args)
+					local client = vim.lsp.get_client_by_id(args.data.client_id)
+					if client and client.name == "ts_ls" then
+						vim.lsp.stop_client(client.id)
+					end
+				end,
 			})
 
 			mason_tool_installer.setup({

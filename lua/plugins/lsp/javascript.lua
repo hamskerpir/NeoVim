@@ -1,62 +1,79 @@
-local lsps = {
-	"ts_ls", -- Handles JavaScript, TypeScript, JSX, and TSX (React)
-	"html", -- Handles HTML files
-	"cssls", -- Handles CSS and SCSS files (often used over 'css-lsp')
-	"tailwindcss", -- Handles Tailwind CSS suggestions and features
-
-	-- Linters and Formatters (often installed by Mason, but configured separately)
-	-- While formatters/linters are configured separately, listing them here ensures they are installed:
-	-- "eslint_d",            -- Linter (If you use the separate LSP for ESLint)
-	-- "prettierd",           -- Formatter (If you use the separate LSP for Prettier)
-}
-
-local linter = "eslint"
-local formatter = "prettier"
-
 local lsp_helpers = require("plugins.lsp.helpers")
 
--- Define the root markers appropriate for Node/Frontend projects
-local root_files = { "package.json", "tsconfig.json", "jsconfig.json", ".git" }
+local root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" }
 
--- Configure all LSPs using the custom 'vim.lsp.config' function
--- NOTE: This assumes your custom 'vim.lsp.config' handles applying
--- these shared settings correctly to each server based on filetype.
-for _, server in ipairs(lsps) do
-	local config = {
-		on_attach = lsp_helpers.get_on_attach(),
-		root_dir = function(fname)
-			return vim.fs.root(fname, root_files)
-		end,
-	}
+local vtsls_settings = {
+	typescript = {
+		inlayHints = {
+			parameterNames = { enabled = "literals" },
+			parameterTypes = { enabled = true },
+			variableTypes = { enabled = true },
+			propertyDeclarationTypes = { enabled = true },
+			functionLikeReturnTypes = { enabled = true },
+			enumMemberValues = { enabled = true },
+		},
+		preferences = { importModuleSpecifier = "non-relative" },
+		updateImportsOnFileMove = { enabled = "always" },
+	},
+	javascript = {
+		inlayHints = {
+			parameterNames = { enabled = "literals" },
+			parameterTypes = { enabled = true },
+		},
+	},
+	vtsls = {
+		enableMoveToFileCodeAction = true,
+		autoUseWorkspaceTsdk = true, -- use the project's own TypeScript SDK
+		experimental = {
+			completion = { enableServerSideFuzzyMatch = true },
+		},
+	},
+}
 
-	-- Add specific settings for 'ts_ls' to support Vue files (Hybrid Mode)
-	if server == "ts_ls" then
-		local ok_reg, registry = pcall(require, "mason-registry")
-		if ok_reg then
-			local ok_pkg, vue_package = pcall(registry.get_package, "vue-language-server")
-			if ok_pkg and type(vue_package) == "table" and vue_package.is_installed and vue_package:is_installed() then
-				local ok_path, vue_plugin_path = pcall(function()
-					return vue_package:get_install_path()
-						.. "/node_modules/@vue/typescript-plugin"
-				end)
-
-				if ok_path then
-					config.init_options = {
-						plugins = {
-							{
-								name = "@vue/typescript-plugin",
-								location = vue_plugin_path,
-								languages = { "vue" },
-							},
-						},
-					}
-					config.filetypes = { "javascript", "typescript", "javascriptreact", "typescriptreact", "vue" }
-				end
-			end
+-- attach Vue plugin if vue-language-server is installed (hybrid mode)
+local ok_reg, registry = pcall(require, "mason-registry")
+if ok_reg then
+	local ok_pkg, vue_pkg = pcall(registry.get_package, "vue-language-server")
+	if ok_pkg and type(vue_pkg) == "table" and vue_pkg.is_installed and vue_pkg:is_installed() then
+		local ok_path, plugin_path = pcall(function()
+			return vue_pkg:get_install_path() .. "/node_modules/@vue/typescript-plugin"
+		end)
+		if ok_path then
+			vtsls_settings.vtsls.tsserver = {
+				globalPlugins = {
+					{
+						name = "@vue/typescript-plugin",
+						location = plugin_path,
+						languages = { "vue" },
+						configNamespace = "typescript",
+						enableForWorkspaceTypeScriptVersions = true,
+					},
+				},
+			}
 		end
 	end
-
-	vim.lsp.config(server, config)
 end
 
-return lsps
+-- root_markers avoids the old function(fname) pattern which is ignored in Neovim 0.12+
+vim.lsp.config("vtsls", {
+	on_attach = lsp_helpers.get_on_attach(),
+	root_markers = root_markers,
+	filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
+	settings = vtsls_settings,
+})
+vim.lsp.enable("vtsls")
+
+vim.lsp.config("eslint", {
+	on_attach = function(_, bufnr)
+		vim.api.nvim_create_autocmd("BufWritePre", {
+			buffer = bufnr,
+			callback = function() pcall(vim.cmd, "EslintFixAll") end,
+		})
+	end,
+	root_markers = {
+		".eslintrc", ".eslintrc.js", ".eslintrc.cjs", ".eslintrc.json",
+		"eslint.config.js", "eslint.config.mjs", "package.json",
+	},
+})
+
+return { "vtsls", "html", "cssls", "tailwindcss", "eslint" }
