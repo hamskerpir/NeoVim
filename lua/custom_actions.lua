@@ -6,6 +6,29 @@ local action_state = require("telescope.actions.state")
 
 local M = {}
 
+-- Send a prompt to OpenCode with an explicit range, so `@this` resolves to the
+-- selection captured before the picker opened rather than the (by-then-normal-mode)
+-- cursor position. Falls back to opencode's own current-mode detection if range is nil.
+local function send_opencode_prompt(prompt_text, range)
+	local ok, discovery = pcall(require, "opencode.server.discovery")
+	if not ok then
+		require("opencode").prompt(prompt_text)
+		return
+	end
+
+	discovery
+		.get()
+		:next(function(server)
+			local context = require("opencode.context").new(server, range)
+			return require("opencode.api.prompt").prompt(prompt_text, context)
+		end)
+		:catch(function(err)
+			if err then
+				vim.notify(err, vim.log.levels.ERROR, { title = "opencode" })
+			end
+		end)
+end
+
 -- Helper to execute LSP code action
 local function execute_lsp_action(action, client_id)
 	local client = vim.lsp.get_client_by_id(client_id)
@@ -179,11 +202,13 @@ M.code_actions = function(opts)
 
 	local mode = vim.api.nvim_get_mode().mode
 	local is_visual = mode:match("[vV\22]") ~= nil
+	local visual_kind = (mode == "V" and "line") or (mode == "v" and "char") or (mode == "\22" and "block")
 
 	local refactor_actions = get_refactor_actions()
 	local dap_actions = get_dap_actions()
 	local custom_actions = get_custom_actions()
 	local range = nil
+	local opencode_range = nil
 
 	if is_visual then
 		-- Sync escape to set '< and '> marks
@@ -193,6 +218,12 @@ M.code_actions = function(opts)
 		range = {
 			start = { line = start_pos[2] - 1, character = start_pos[3] - 1 },
 			["end"] = { line = end_pos[2] - 1, character = end_pos[3] },
+		}
+		-- opencode.nvim's own range shape: { from, to } are 1-based line, 0-based col
+		opencode_range = {
+			from = { start_pos[2], start_pos[3] - 1 },
+			to = { end_pos[2], end_pos[3] - 1 },
+			kind = visual_kind,
 		}
 	end
 
@@ -235,11 +266,29 @@ M.code_actions = function(opts)
 			attach_mappings = function(prompt_bufnr, map)
 				actions.select_default:replace(function()
 					local selection = action_state.get_selected_entry()
-					actions.close(prompt_bufnr)
 
 					if not selection then
+						-- No action matches the typed text — hand it off to OpenCode as a prompt.
+						local prompt_text = action_state.get_current_line()
+						actions.close(prompt_bufnr)
+
+						if prompt_text ~= "" then
+							local has_opencode = pcall(require, "opencode")
+							if has_opencode then
+								if is_visual then
+									prompt_text = "@this: " .. prompt_text
+								end
+								vim.schedule(function()
+									send_opencode_prompt(prompt_text, opencode_range)
+								end)
+							else
+								vim.notify("No matching action and OpenCode is not available", vim.log.levels.WARN)
+							end
+						end
 						return
 					end
+
+					actions.close(prompt_bufnr)
 					local item = selection.value
 
 					vim.schedule(function()
