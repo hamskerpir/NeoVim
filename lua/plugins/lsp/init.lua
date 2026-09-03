@@ -9,6 +9,7 @@ local deps = {
 	"plugins.lsp.kubernetes.helm",
 	-- "plugins.lsp.terraform.hcl",
 	"plugins.lsp.terraform.terraform",
+	"plugins.lsp.rust",
 }
 
 return {
