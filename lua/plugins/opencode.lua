@@ -38,19 +38,28 @@ return {
         -- Resolve OpenCode's reported filepath the same way its own (built-in) diff
         -- handler does — it's sometimes absolute, sometimes relative to HOME.
         local function resolve_edit_filepath(filepath)
-            local absolute_filepath = vim.fn.fnamemodify(filepath, ":p")
-            if vim.fn.filereadable(absolute_filepath) == 1 then
-                return absolute_filepath
-            end
+            local candidates = { vim.fn.fnamemodify(filepath, ":p") }
             if vim.env.HOME and vim.env.HOME ~= "" then
-                local home_filepath = vim.fs.normalize(vim.fs.joinpath(vim.env.HOME, filepath))
-                if vim.fn.filereadable(home_filepath) == 1 then
-                    return home_filepath
+                table.insert(candidates, vim.fs.normalize(vim.fs.joinpath(vim.env.HOME, filepath)))
+            end
+            table.insert(candidates, filepath)
+
+            -- Prefer a candidate that already exists on disk.
+            for _, candidate in ipairs(candidates) do
+                if vim.fn.filereadable(candidate) == 1 then
+                    return candidate
                 end
             end
-            if vim.fn.filereadable(filepath) == 1 then
-                return filepath
+
+            -- Otherwise, OpenCode may be creating a brand-new file — accept the
+            -- first candidate whose parent directory already exists.
+            for _, candidate in ipairs(candidates) do
+                local dir = vim.fn.fnamemodify(candidate, ":h")
+                if vim.fn.isdirectory(dir) == 1 then
+                    return candidate
+                end
             end
+
             return nil
         end
 
@@ -293,7 +302,7 @@ return {
             { desc = "Ask OpenCode…" })
         vim.keymap.set({ "n", "x" }, "<C-x>", function() require("opencode").select() end,
             { desc = "Select OpenCode…" })
-        vim.keymap.set({ "n", "x" }, "aa", function() return require("opencode").operator("@this ") end,
+        vim.keymap.set({ "v" }, "aa", function() return require("opencode").operator("@this ") end,
             { desc = "Append range to OpenCode", expr = true })
     end,
 }

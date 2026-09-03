@@ -21,7 +21,7 @@ M.setup = function()
 			-- Strip whitespaces
 			vim.cmd([[StripWhitespace]])
 
-			require("conform").format({ bufnr = args.buf })
+			require("conform").format({ bufnr = args.buf, timeout_ms = 5000 })
 		end,
 	})
 end
