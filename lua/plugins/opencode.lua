@@ -293,7 +293,7 @@ return {
             { desc = "Ask OpenCode…" })
         vim.keymap.set({ "n", "x" }, "<C-x>", function() require("opencode").select() end,
             { desc = "Select OpenCode…" })
-        vim.keymap.set({ "n", "x" }, "aa", function() return require("opencode").operator("@this ") end,
+        vim.keymap.set({ "v" }, "aa", function() return require("opencode").operator("@this ") end,
             { desc = "Append range to OpenCode", expr = true })
     end,
 }
