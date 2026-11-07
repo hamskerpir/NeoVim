@@ -34,15 +34,11 @@ return {
 			end
 
 			mason_lspconfig.setup({
-				automatic_installation = true,
 				ensure_installed = mod_deps,
-				handlers = {
-					function(server_name)
-						require("lspconfig")[server_name].setup({})
-					end,
-					-- managed directly via vim.lsp.config + vim.lsp.enable in javascript.lua
-					ts_ls = function() end,
-					vtsls = function() end,
+				-- mason-lspconfig v2 auto-enables all installed Mason servers;
+				-- exclude ts_ls so vtsls handles TypeScript + Vue hybrid mode cleanly.
+				automatic_enable = {
+					exclude = { "ts_ls" },
 				},
 			})
 

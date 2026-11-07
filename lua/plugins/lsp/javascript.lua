@@ -30,33 +30,40 @@ local vtsls_settings = {
 	},
 }
 
--- attach Vue plugin if vue-language-server is installed (hybrid mode)
-local ok_reg, registry = pcall(require, "mason-registry")
-if ok_reg then
-	local ok_pkg, vue_pkg = pcall(registry.get_package, "vue-language-server")
-	if ok_pkg and type(vue_pkg) == "table" and vue_pkg.is_installed and vue_pkg:is_installed() then
-		local ok_path, plugin_path = pcall(function()
-			return vue_pkg:get_install_path() .. "/node_modules/@vue/typescript-plugin"
-		end)
-		if ok_path then
-			vtsls_settings.vtsls.tsserver = {
-				globalPlugins = {
-					{
-						name = "@vue/typescript-plugin",
-						location = plugin_path,
-						languages = { "vue" },
-						configNamespace = "typescript",
-						enableForWorkspaceTypeScriptVersions = true,
-					},
-				},
-			}
-		end
-	end
-end
+-- Attach @vue/typescript-plugin for Vue 3+ hybrid mode (Mason v2 path)
+-- https://github.com/vuejs/language-tools/wiki/Neovim
+local mason_packages = (vim.env.MASON and (vim.env.MASON .. "/packages"))
+	or (vim.fn.stdpath("data") .. "/mason/packages")
+local vue_language_server_path = mason_packages .. "/vue-language-server/node_modules/@vue/language-server"
+
+vtsls_settings.vtsls.tsserver = {
+	globalPlugins = {
+		{
+			name = "@vue/typescript-plugin",
+			location = vue_language_server_path,
+			languages = { "vue" },
+			configNamespace = "typescript",
+			enableForWorkspaceTypeScriptVersions = true,
+		},
+	},
+}
+
+local base_on_attach = lsp_helpers.get_on_attach()
 
 -- root_markers avoids the old function(fname) pattern which is ignored in Neovim 0.12+
 vim.lsp.config("vtsls", {
-	on_attach = lsp_helpers.get_on_attach(),
+	capabilities = lsp_helpers.get_capabilities(),
+	on_attach = function(client, bufnr)
+		base_on_attach(client, bufnr)
+		local existing_capabilities = client.server_capabilities
+		if existing_capabilities.semanticTokensProvider then
+			if vim.bo[bufnr].filetype == "vue" then
+				existing_capabilities.semanticTokensProvider.full = false
+			else
+				existing_capabilities.semanticTokensProvider.full = true
+			end
+		end
+	end,
 	root_markers = root_markers,
 	filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact", "vue" },
 	settings = vtsls_settings,
